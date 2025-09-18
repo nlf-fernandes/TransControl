@@ -3,7 +3,7 @@ from funcoes.viagens import cadastrar_viagem, listar_viagens
 from funcoes.passageiros import cadastrar_passageiro 
 from funcoes.utilitarios import carregar_dados,salvar_dados
 
-#menu inicial - o usuario navegará a partir daqui 
+#menu inicial - o usuario navegará a partir daqui.
 def menu():
     while True:
         print('/n==== Sistema TransControl====')
@@ -30,4 +30,8 @@ def menu():
             print('Encerrando o sistema...')
             break
         else:
-            print('Opção invalida tente novamente.')
+            print('Opção invalida. Tente novamente.')
+
+#Se o arquivo main.py for executado ira chamar a função menu.
+if __name__ == "__main__":
+    menu()
