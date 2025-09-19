@@ -152,4 +152,3 @@ def atualizar_viagem(lista_viagens):
             print("ERRO: Status inválido.")
     else:
         print("ERRO: Opção inválida.")
-
