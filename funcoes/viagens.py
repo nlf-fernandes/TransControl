@@ -1,5 +1,3 @@
-# Módulo de Gestão de Viagens (Responsável: Abner)
-
 def encontrar_viagem_por_id(lista_viagens, id_viagem):
     """Busca uma viagem na lista pelo seu ID e retorna o dicionário da viagem ou None."""
     for viagem in lista_viagens:
@@ -154,3 +152,4 @@ def atualizar_viagem(lista_viagens):
             print("ERRO: Status inválido.")
     else:
         print("ERRO: Opção inválida.")
+
