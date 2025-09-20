@@ -1,6 +1,17 @@
 # TransControl
 Projeto da faculade que tem como intuito ajudar uma transportadora com seus registros de viajens.
 
+
+
+
+
+
+
+
+
+
+
+
 Observação Crucial para o Grupo (Principalmente para o Luis H.)
 Para que o salvar_dados() e carregar_dados() funcione com essa estrutura, o arquivo utilitarios.py precisará importar as listas de todos os outros módulos.
 
