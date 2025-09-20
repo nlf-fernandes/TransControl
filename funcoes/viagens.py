@@ -1,15 +1,7 @@
 #Abner
-# Importa a lista de vans do módulo 'vans.py' para poder consultá-la.
-# O "." antes de "vans" é importante, pois indica que é um módulo na mesma pasta (funcoes).
 from .vans import lista_vans
 
-# --- Variável Global do Módulo ---
-# Esta lista armazenará todos os dicionários de viagens.
-# Ela será preenchida pela função carregar_dados() e manipulada pelas funções abaixo.
 lista_viagens = []
-
-
-# --- Funções Auxiliares (não são chamadas pelo menu, mas ajudam as principais) ---
 
 def encontrar_viagem_por_id(id_viagem):
     """Busca uma viagem na lista global pelo seu ID."""
