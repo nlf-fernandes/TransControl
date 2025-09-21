@@ -1,10 +1,8 @@
 # Abner
 from .vans import vans 
 
-# --- Variável Global do Módulo ---
 lista_viagens = []
 
-# --- Funções Auxiliares ---
 def encontrar_viagem_por_id(id_viagem):
     for viagem in lista_viagens:
         if viagem["id"] == id_viagem:
@@ -17,7 +15,6 @@ def listar_vans_disponiveis():
         if viagem["status"] in ["Agendada", "Em Andamento"]
     }
     
-    # Acessa a lista 'vans' importada (NOME CORRIGIDO)
     vans_disponiveis = [
         van for van in vans 
         if van["placa"] not in placas_em_viagem
@@ -33,11 +30,9 @@ def listar_vans_disponiveis():
     
     return [van['placa'] for van in vans_disponiveis]
 
-# --- Funções Principais ---
 def cadastrar_viagem():
     print("\n--- Cadastro de Nova Viagem ---")
 
-    # Verifica a lista 'vans' importada (NOME CORRIGIDO)
     if not vans:
         print("ERRO: Nenhuma van cadastrada no sistema.")
         return
@@ -66,7 +61,7 @@ def cadastrar_viagem():
     novo_id = len(lista_viagens) + 1
     nova_viagem = { "id": novo_id, "destino": destino, "distancia_km": distancia_km, "preco_combustivel": preco_combustivel, "van_placa": placa_escolhida, "passageiros": [], "status": "Agendada", "custo_estimado": 0.0, "receita_total": 0.0, "lucro": 0.0 }
     lista_viagens.append(nova_viagem)
-    print(f"\n✅ Viagem para {destino} (ID: {novo_id}) cadastrada com sucesso!")
+    print(f"\n Viagem para {destino} (ID: {novo_id}) cadastrada com sucesso!")
 
 def listar_viagens():
     print("\n--- Lista de Todas as Viagens ---")
