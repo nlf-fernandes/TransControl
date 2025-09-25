@@ -1,7 +1,7 @@
 # funcoes/utilitarios.py
 
 # Importa as listas globais de cada módulo
-from .vans import lista_vans
+from .vans import vans
 from .viagens import lista_viagens
 from .passageiros import lista_passageiros
 
@@ -17,7 +17,7 @@ def salvar_dados():
         with open(ARQUIVO_DADOS, "w", encoding="utf-8") as f:
             # ----- Salvar vans -----
             f.write("[VANS]\n")
-            for van in lista_vans:
+            for van in vans:
                 linha = f"{van['placa']};{van['modelo']};{van['capacidade']};{van['km_inicial']}\n"
                 f.write(linha)
 
@@ -44,7 +44,7 @@ def carregar_dados():
     try:
         with open(ARQUIVO_DADOS, "r", encoding="utf-8") as f:
             secao = None
-            lista_vans.clear()
+            vans.clear()
             lista_viagens.clear()
             lista_passageiros.clear()
 
@@ -67,7 +67,7 @@ def carregar_dados():
                 # Carrega dados conforme a seção
                 if secao == "vans":
                     placa, modelo, capacidade, km_inicial = linha.split(";")
-                    lista_vans.append({
+                    vans.append({
                         "placa": placa,
                         "modelo": modelo,
                         "capacidade": int(capacidade),
@@ -116,7 +116,7 @@ def calcular_custo(viagem_id):
     placa_van = viagem["van"]
 
     # Buscar a van correspondente
-    van = next((v for v in lista_vans if v["placa"] == placa_van), None)
+    van = next((v for v in vans if v["placa"] == placa_van), None)
     if not van:
         return 0.0
 
