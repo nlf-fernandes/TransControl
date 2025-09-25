@@ -33,7 +33,7 @@ def salvar_dados():
                 linha = f"{passageiro['nome']};{passageiro['valor_pago']};{passageiro['viagem']}\n"
                 f.write(linha)
 
-        print("✅ Dados salvos com sucesso!")
+        print(" Dados salvos com sucesso!")
 
     except IOError as e:
         print(f"Erro ao salvar dados: {e}")
@@ -91,10 +91,10 @@ def carregar_dados():
                         "viagem": viagem
                     })
 
-        print("✅ Dados carregados com sucesso!")
+        print(" Dados carregados com sucesso!")
 
     except FileNotFoundError:
-        print("⚠️ Nenhum arquivo de dados encontrado. Começando com listas vazias.")
+        print(" Nenhum arquivo de dados encontrado. Começando com listas vazias.")
     except Exception as e:
         print(f"Erro ao carregar dados: {e}")
 
@@ -140,7 +140,7 @@ def calcular_lucro(viagem_id):
 def consultar_viagem(viagem_id):
     """Mostra detalhes completos de uma viagem"""
     if viagem_id < 0 or viagem_id >= len(lista_viagens):
-        print("⚠️ Viagem não encontrada.")
+        print(" Viagem não encontrada.")
         return
 
     viagem = lista_viagens[viagem_id]
@@ -169,3 +169,4 @@ def consultar_viagem(viagem_id):
     print(f"Custo estimado: R$ {custo:.2f}")
     print(f"Lucro: R$ {lucro:.2f}")
     print("===============================\n")
+
