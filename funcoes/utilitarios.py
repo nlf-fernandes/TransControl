@@ -1,5 +1,3 @@
-# funcoes/utilitarios.py
-
 # Importa as listas globais de cada módulo
 from .vans import vans
 from .viagens import lista_viagens
@@ -169,4 +167,3 @@ def consultar_viagem(viagem_id):
     print(f"Custo estimado: R$ {custo:.2f}")
     print(f"Lucro: R$ {lucro:.2f}")
     print("===============================\n")
-
