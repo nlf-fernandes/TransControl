@@ -1,169 +1,119 @@
-# Importa as listas globais de cada módulo
+# Luis H.
 from .vans import vans
-from .viagens import lista_viagens
-from .passageiros import lista_passageiros
+from .viagens import lista_viagens, encontrar_viagem_por_id, listar_viagens
 
-ARQUIVO_DADOS = "dados/dados_do_sistema.txt"
+# Define o nome do arquivo que guardará os dados
+ARQUIVO_DADOS = "dados_do_sistema.txt"
 
-
-# ==============================
-#   PERSISTÊNCIA DOS DADOS
-# ==============================
 def salvar_dados():
-    """Salva vans, viagens e passageiros em arquivo .txt"""
+    """Salva os dados de vans e viagens (com seus passageiros) no arquivo."""
     try:
         with open(ARQUIVO_DADOS, "w", encoding="utf-8") as f:
-            # ----- Salvar vans -----
+            # Salva a seção de vans
             f.write("[VANS]\n")
             for van in vans:
-                linha = f"{van['placa']};{van['modelo']};{van['capacidade']};{van['km_inicial']}\n"
+                linha = f"{van['placa']};{van['modelo']};{van['capacidade']};{van['consumo_km_l']}\n"
                 f.write(linha)
-
-            # ----- Salvar viagens -----
+            
+            # Salva a seção de viagens
             f.write("[VIAGENS]\n")
             for viagem in lista_viagens:
-                linha = f"{viagem['van']};{viagem['destino']};{viagem['distancia']};{viagem['preco_combustivel']}\n"
+                linha = f"{viagem['id']};{viagem['destino']};{viagem['distancia_km']};{viagem['preco_combustivel']};{viagem['van_placa']};{viagem['status']}\n"
                 f.write(linha)
 
-            # ----- Salvar passageiros -----
+            # Salva a seção de passageiros, vinculando-os a uma viagem pelo ID
             f.write("[PASSAGEIROS]\n")
-            for passageiro in lista_passageiros:
-                linha = f"{passageiro['nome']};{passageiro['valor_pago']};{passageiro['viagem']}\n"
-                f.write(linha)
-
-        print(" Dados salvos com sucesso!")
-
+            for viagem in lista_viagens:
+                for passageiro in viagem['passageiros']:
+                    linha = f"{viagem['id']};{passageiro['nome']};{passageiro['valor_pago']}\n"
+                    f.write(linha)
+        
+        print("Dados salvos com sucesso!")
     except IOError as e:
-        print(f"Erro ao salvar dados: {e}")
-
+        print(f"ERRO ao salvar dados: {e}")
 
 def carregar_dados():
-    """Carrega vans, viagens e passageiros do arquivo .txt"""
+    """Carrega os dados do arquivo para as listas do sistema."""
     try:
         with open(ARQUIVO_DADOS, "r", encoding="utf-8") as f:
-            secao = None
+            secao_atual = None
+            # Limpa as listas atuais antes de carregar novos dados
             vans.clear()
             lista_viagens.clear()
-            lista_passageiros.clear()
 
             for linha in f:
                 linha = linha.strip()
                 if not linha:
                     continue
 
-                # Detecta seção
-                if linha == "[VANS]":
-                    secao = "vans"
-                    continue
-                elif linha == "[VIAGENS]":
-                    secao = "viagens"
-                    continue
-                elif linha == "[PASSAGEIROS]":
-                    secao = "passageiros"
+                if linha.startswith('['):
+                    secao_atual = linha
                     continue
 
-                # Carrega dados conforme a seção
-                if secao == "vans":
-                    placa, modelo, capacidade, km_inicial = linha.split(";")
+                partes = linha.split(";")
+                if secao_atual == "[VANS]":
                     vans.append({
-                        "placa": placa,
-                        "modelo": modelo,
-                        "capacidade": int(capacidade),
-                        "km_inicial": float(km_inicial)
+                        "placa": partes[0], "modelo": partes[1],
+                        "capacidade": int(partes[2]), "consumo_km_l": float(partes[3])
                     })
-
-                elif secao == "viagens":
-                    van, destino, distancia, preco_combustivel = linha.split(";")
+                elif secao_atual == "[VIAGENS]":
                     lista_viagens.append({
-                        "van": van,
-                        "destino": destino,
-                        "distancia": float(distancia),
-                        "preco_combustivel": float(preco_combustivel)
+                        "id": int(partes[0]), "destino": partes[1],
+                        "distancia_km": float(partes[2]), "preco_combustivel": float(partes[3]),
+                        "van_placa": partes[4], "status": partes[5], "passageiros": []
                     })
-
-                elif secao == "passageiros":
-                    nome, valor_pago, viagem = linha.split(";")
-                    lista_passageiros.append({
-                        "nome": nome,
-                        "valor_pago": float(valor_pago),
-                        "viagem": viagem
-                    })
-
-        print(" Dados carregados com sucesso!")
+                elif secao_atual == "[PASSAGEIROS]":
+                    id_viagem = int(partes[0])
+                    viagem = encontrar_viagem_por_id(id_viagem)
+                    if viagem:
+                        viagem['passageiros'].append({"nome": partes[1], "valor_pago": float(partes[2])})
+            
+            print("Dados carregados com sucesso!")
 
     except FileNotFoundError:
-        print(" Nenhum arquivo de dados encontrado. Começando com listas vazias.")
+        print("Arquivo de dados não encontrado. Começando um novo sistema.")
     except Exception as e:
-        print(f"Erro ao carregar dados: {e}")
+        print(f"ERRO ao carregar dados: {e}")
 
-
-# ==============================
-#   CÁLCULOS
-# ==============================
-def calcular_receita(viagem_id):
-    """Soma o valor pago por todos os passageiros de uma viagem"""
-    viagem = lista_viagens[viagem_id]
-    placa_van = viagem["van"]
-    receita = sum(p["valor_pago"] for p in lista_passageiros if p["viagem"] == placa_van)
-    return receita
-
-
-def calcular_custo(viagem_id):
-    """Calcula custo estimado = distancia / consumo * preço do combustível"""
-    viagem = lista_viagens[viagem_id]
-    placa_van = viagem["van"]
-
-    # Buscar a van correspondente
-    van = next((v for v in vans if v["placa"] == placa_van), None)
-    if not van:
-        return 0.0
-
-    # Aqui assumo que "km_inicial" não é o consumo, então você pode ajustar
-    # Exemplo: consumo = 10 km/L
-    consumo = 10  
-
-    distancia = viagem["distancia"]
-    preco = viagem["preco_combustivel"]
-    return (distancia / consumo) * preco
-
-
-def calcular_lucro(viagem_id):
-    """Lucro = receita - custo"""
-    return calcular_receita(viagem_id) - calcular_custo(viagem_id)
-
-
-# ==============================
-#   CONSULTAS
-# ==============================
-def consultar_viagem(viagem_id):
-    """Mostra detalhes completos de uma viagem"""
-    if viagem_id < 0 or viagem_id >= len(lista_viagens):
-        print(" Viagem não encontrada.")
+def consultar_viagem_detalhes():
+    """Mostra um relatório completo de uma viagem, incluindo o financeiro."""
+    listar_viagens()
+    if not lista_viagens:
+        return
+        
+    try:
+        id_viagem = int(input("\nDigite o ID da viagem para ver os detalhes: "))
+        viagem = encontrar_viagem_por_id(id_viagem)
+        if not viagem:
+            print("ERRO: Viagem não encontrada com este ID.")
+            return
+    except ValueError:
+        print("ERRO: ID inválido. Digite um número.")
         return
 
-    viagem = lista_viagens[viagem_id]
-    print("\n===== DETALHES DA VIAGEM =====")
-    print(f"Van usada: {viagem['van']}")
-    print(f"Destino: {viagem['destino']}")
-    print(f"Distância: {viagem['distancia']} km")
-    print(f"Preço do combustível: R$ {viagem['preco_combustivel']:.2f}")
-
-    # Passageiros dessa viagem
-    print("\n--- Passageiros ---")
-    passageiros_viagem = [p for p in lista_passageiros if p["viagem"] == viagem["van"]]
-    if passageiros_viagem:
-        for p in passageiros_viagem:
-            print(f"{p['nome']} - R$ {p['valor_pago']:.2f}")
-    else:
-        print("Nenhum passageiro cadastrado.")
-
+    # Encontrar a van associada para pegar o consumo
+    van_associada = next((v for v in vans if v["placa"] == viagem["van_placa"]), None)
+    
     # Cálculos
-    receita = calcular_receita(viagem_id)
-    custo = calcular_custo(viagem_id)
-    lucro = calcular_lucro(viagem_id)
+    receita = sum(p["valor_pago"] for p in viagem["passageiros"])
+    custo = 0
+    if van_associada and van_associada['consumo_km_l'] > 0:
+        custo = (viagem["distancia_km"] / van_associada['consumo_km_l']) * viagem["preco_combustivel"]
+    lucro = receita - custo
 
-    print("\n--- Financeiro ---")
-    print(f"Receita total: R$ {receita:.2f}")
-    print(f"Custo estimado: R$ {custo:.2f}")
-    print(f"Lucro: R$ {lucro:.2f}")
-    print("===============================\n")
+    print(f"\n--- Detalhes da Viagem {viagem['id']} para {viagem['destino']} ---")
+    print(f"Status: {viagem['status']} | Van: {viagem['van_placa']}")
+    print(f"Distância: {viagem['distancia_km']} km | Preço Combustível: R$ {viagem['preco_combustivel']:.2f}")
+
+    print("\n--- Passageiros ---")
+    if not viagem["passageiros"]:
+        print("Nenhum passageiro nesta viagem.")
+    else:
+        for p in viagem["passageiros"]:
+            print(f"- {p['nome']} (Pagou: R$ {p['valor_pago']:.2f})")
+
+    print("\n--- Relatório Financeiro ---")
+    print(f"Receita Total: R$ {receita:.2f}")
+    print(f"Custo Estimado com Combustível: R$ {custo:.2f}")
+    print(f"Lucro Estimado: R$ {lucro:.2f}")
+    print("-" * 30)
