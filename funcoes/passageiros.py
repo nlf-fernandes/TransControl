@@ -1,48 +1,51 @@
-Observação Crucial para o Grupo (Principalmente para o Luis H.)
-Para que o salvar_dados() e carregar_dados() funcione com essa estrutura, o arquivo utilitarios.py precisará importar as listas de todos os outros módulos.
-O arquivo funcoes/utilitarios.py deverá ter um começo assim:
+from funcoes.viagens import viagens
 
-# funcoes/utilitarios.py
-import json
+# Função para cadastrar passageiro em uma viagem
+def cadastrar_passageiro():
+    if not viagens:
+        print("\nNenhuma viagem cadastrada ainda.\n")
+        return
+    
+    print("\n=== Cadastro de Passageiros ===")
+    for v in viagens:
+        print(f"ID: {v['id']} | Origem: {v['origem']} -> Destino: {v['destino']} | Data: {v['data']}")
 
-# Importa as listas globais de cada módulo para poder salvá-las e carregá-las
-from .vans import lista_vans
-from .viagens import lista_viagens
-from .passageiros import lista_passageiros
-
-ARQUIVO_DADOS = "dados/dados_do_sistema.json"
-
-def salvar_dados():
-    # Agrupa todos os dados em um único dicionário
-    dados_completos = {
-        "vans": lista_vans,
-        "viagens": lista_viagens,
-        "passageiros": lista_passageiros
-    }
     try:
-        with open(ARQUIVO_DADOS, 'w', encoding='utf-8') as f:
-            json.dump(dados_completos, f, indent=4, ensure_ascii=False)
-        # O print de sucesso fica no main.py
-    except IOError as e:
-        print(f"Erro ao salvar dados: {e}")
+        id_viagem = int(input("Digite o ID da viagem para adicionar passageiro: "))
+        viagem = next((v for v in viagens if v["id"] == id_viagem), None)
 
-def carregar_dados():
-    try:
-        with open(ARQUIVO_DADOS, 'r', encoding='utf-8') as f:
-            dados_completos = json.load(f)
-            
-            # Limpa as listas atuais e carrega os dados do arquivo
-            lista_vans.clear()
-            lista_vans.extend(dados_completos.get("vans", []))
-            
-            lista_viagens.clear()
-            lista_viagens.extend(dados_completos.get("viagens", []))
-            
-            lista_passageiros.clear()
-            lista_passageiros.extend(dados_completos.get("passageiros", []))
-            # O print de sucesso fica no main.py
-            
-    except FileNotFoundError:
-        print("Arquivo de dados não encontrado. Começando com listas vazias.")
-    except json.JSONDecodeError:
-        print("Erro ao ler o arquivo de dados. Pode estar corrompido.")
+        if viagem is None:
+            print("Viagem não encontrada.")
+            return
+
+        nome = input("Nome do passageiro: ")
+        valor_pago = float(input("Valor pago: "))
+
+        passageiro = {
+            "nome": nome,
+            "valor_pago": valor_pago
+        }
+
+        viagem["passageiros"].append(passageiro)
+        print(f"Passageiro {nome} adicionado na viagem {id_viagem} com sucesso!\n")
+
+    except ValueError:
+        print("Entrada inválida. Digite os dados corretamente.")
+
+
+# Função para listar passageiros de todas as viagens
+def listar_passageiros():
+    if not viagens:
+        print("\nNenhuma viagem cadastrada ainda.\n")
+        return
+
+    print("\n=== Lista de Passageiros ===")
+    for v in viagens:
+        print(f"\nViagem {v['id']} | {v['origem']} -> {v['destino']} | Data: {v['data']}")
+        if not v["passageiros"]:
+            print("   Nenhum passageiro cadastrado.")
+        else:
+            for i, p in enumerate(v["passageiros"], start=1):
+                print(f"   {i}. Nome: {p['nome']} | Valor Pago: R$ {p['valor_pago']:.2f}")
+
+
