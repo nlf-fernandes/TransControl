@@ -105,4 +105,3 @@ def remover_van():
         print(f"Van {van_removida['placa']} removida com sucesso!\n")
     else:
         print('Van não encontrada.\n')
-
