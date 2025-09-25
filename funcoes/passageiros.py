@@ -1,108 +1,57 @@
-from funcoes.passageiros import (
-    cadastrar_passageiro,
-    listar_passageiros,
-    editar_passageiro,
-    remover_passageiro,
-    contar_passageiros
-)
 
-# Submenu de Passageiros
-def menu_passageiros():
-    while True:
-        print("\n=== Gerenciamento de Passageiros ===")
-        print("1 - Cadastrar Passageiro")
-        print("2 - Listar Passageiros")
-        print("3 - Editar Passageiro")
-        print("4 - Remover Passageiro")
-        print("5 - Contar Passageiros por Viagem")
-        print("0 - Voltar")
-
-        opcao = input("Escolha uma opção: ")
-
-        if opcao == "1":
-            cadastrar_passageiro()
-        elif opcao == "2":
-            listar_passageiros()
-        elif opcao == "3":
-            editar_passageiro()
-        elif opcao == "4":
-            remover_passageiro()
-        elif opcao == "5":
-            contar_passageiros()
-        elif opcao == "0":
-            break
-        else:
-            print("Opção inválida! Tente novamente.")
-
-# Editar passageiro
-def editar_passageiro():
-    if not viagens:
-        print("\nNenhuma viagem cadastrada.\n")
-        return
-
-    id_viagem = int(input("Digite o ID da viagem: "))
-    viagem = next((v for v in viagens if v["id"] == id_viagem), None)
-
-    if viagem is None:
-        print("Viagem não encontrada.")
-        return
-
-    if not viagem["passageiros"]:
-        print("Nenhum passageiro cadastrado nessa viagem.")
-        return
-
-    for i, p in enumerate(viagem["passageiros"], start=1):
-        print(f"{i}. Nome: {p['nome']} | Valor Pago: R$ {p['valor_pago']:.2f}")
-
-    indice = int(input("Digite o número do passageiro para editar: ")) - 1
-    if 0 <= indice < len(viagem["passageiros"]):
-        novo_nome = input("Novo nome (ou Enter para manter): ")
-        if novo_nome:
-            viagem["passageiros"][indice]["nome"] = novo_nome
-
-        novo_valor = input("Novo valor pago (ou Enter para manter): ")
-        if novo_valor:
-            viagem["passageiros"][indice]["valor_pago"] = float(novo_valor)
-
-        print("Passageiro atualizado com sucesso!")
-    else:
-        print("Passageiro não encontrado.")
+from funcoes.viagens import viagens
 
 
-# Remover passageiro
-def remover_passageiro():
-    if not viagens:
-        print("\nNenhuma viagem cadastrada.\n")
-        return
+def salvar_dados():
+    try:
+        with open("dados.txt", "w", encoding="utf-8") as f:
+            for v in viagens:
+                # salva dados da viagem
+                linha_viagem = f"VIAGEM|{v['id']}|{v['origem']}|{v['destino']}|{v['data']}\n"
+                f.write(linha_viagem)
 
-    id_viagem = int(input("Digite o ID da viagem: "))
-    viagem = next((v for v in viagens if v["id"] == id_viagem), None)
+                # salva passageiros da viagem
+                for p in v["passageiros"]:
+                    linha_pass = f"PASSAGEIRO|{v['id']}|{p['nome']}|{p['valor_pago']}\n"
+                    f.write(linha_pass)
 
-    if viagem is None:
-        print("Viagem não encontrada.")
-        return
+        print("✅ Dados salvos com sucesso!")
 
-    if not viagem["passageiros"]:
-        print("Nenhum passageiro cadastrado nessa viagem.")
-        return
-
-    for i, p in enumerate(viagem["passageiros"], start=1):
-        print(f"{i}. Nome: {p['nome']} | Valor Pago: R$ {p['valor_pago']:.2f}")
-
-    indice = int(input("Digite o número do passageiro para remover: ")) - 1
-    if 0 <= indice < len(viagem["passageiros"]):
-        removido = viagem["passageiros"].pop(indice)
-        print(f"Passageiro {removido['nome']} removido com sucesso!")
-    else:
-        print("Passageiro não encontrado.")
+    except Exception as e:
+        print(f"Erro ao salvar dados: {e}")
 
 
-# Contar total de passageiros
-def contar_passageiros():
-    if not viagens:
-        print("\nNenhuma viagem cadastrada.\n")
-        return
+def carregar_dados():
+    try:
+        viagens.clear()  # limpa lista antes de carregar
 
-    print("\n=== Total de Passageiros por Viagem ===")
-    for v in viagens:
-        print(f"Viagem {v['id']} ({v['origem']} -> {v['destino']}) tem {len(v['passageiros'])} passageiro(s).")
+        with open("dados.txt", "r", encoding="utf-8") as f:
+            linhas = f.readlines()
+
+        viagens_temp = {}
+        for linha in linhas:
+            partes = linha.strip().split("|")
+
+            if partes[0] == "VIAGEM":
+                id_viagem = int(partes[1])
+                viagens_temp[id_viagem] = {
+                    "id": id_viagem,
+                    "origem": partes[2],
+                    "destino": partes[3],
+                    "data": partes[4],
+                    "passageiros": []
+                }
+
+            elif partes[0] == "PASSAGEIRO":
+                id_viagem = int(partes[1])
+                if id_viagem in viagens_temp:
+                    passageiro = {"nome": partes[2], "valor_pago": float(partes[3])}
+                    viagens_temp[id_viagem]["passageiros"].append(passageiro)
+
+        viagens.extend(viagens_temp.values())
+        print("✅ Dados carregados com sucesso!")
+
+    except FileNotFoundError:
+        print("⚠ Nenhum arquivo encontrado para carregar.")
+    except Exception as e:
+        print(f"Erro ao carregar dados: {e}")
