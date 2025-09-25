@@ -1,18 +1,19 @@
 from funcoes.vans import cadastrar_van, listar_vans, atualizar_van, remover_van
-from funcoes.viagens import cadastrar_viagem, listar_viagens
-from funcoes.passageiros import cadastrar_passageiro, listar_passageiros, editar_passageiro, remover_passageiro, contar_passageiros
-from funcoes.utilitarios import carregar_dados, salvar_dados
+from funcoes.viagens import cadastrar_viagem, listar_viagens, atualizar_viagem_status
+from funcoes.passageiros import cadastrar_passageiro, listar_passageiros_viagem, remover_passageiro
+from funcoes.utilitarios import carregar_dados, salvar_dados, consultar_viagem_detalhes
 
+# --- SUBMENUS ---
 
-# Submenu de Vans
 def menu_vans():
+    """Gerencia as opções relacionadas às vans."""
     while True:
-        print('\n=== Gerenciamento de Vans ===')
-        print('1 - Cadastrar Van')
-        print('2 - Listar Vans')
-        print('3 - Atualizar Van')
-        print('4 - Remover Van')
-        print('0 - Voltar')
+        print('\n--- Gerenciamento de Vans ---')
+        print('1 - Cadastrar Nova Van')
+        print('2 - Listar Todas as Vans')
+        print('3 - Atualizar Dados de uma Van')
+        print('4 - Remover uma Van')
+        print('0 - Voltar ao Menu Principal')
 
         opcao = input('Escolha uma opção: ')
 
@@ -29,13 +30,14 @@ def menu_vans():
         else:
             print('Opção inválida! Tente novamente.')
 
-# Submenu de Viagens
 def menu_viagens():
+    """Gerencia as opções relacionadas às viagens."""
     while True:
-        print('\n=== Gerenciamento de Viagens ===')
-        print('1 - Cadastrar Viagem')
-        print('2 - Listar Viagens')
-        print('0 - Voltar')
+        print('\n--- Gerenciamento de Viagens ---')
+        print('1 - Cadastrar Nova Viagem')
+        print('2 - Listar Todas as Viagens')
+        print('3 - Atualizar Status de uma Viagem')
+        print('0 - Voltar ao Menu Principal')
 
         opcao = input('Escolha uma opção: ')
 
@@ -43,49 +45,50 @@ def menu_viagens():
             cadastrar_viagem()
         elif opcao == '2':
             listar_viagens()
+        elif opcao == '3':
+            atualizar_viagem_status()
         elif opcao == '0':
             break
         else:
             print('Opção inválida! Tente novamente.')
 
-# Submenu de Passageiros
 def menu_passageiros():
+    """Gerencia as opções relacionadas aos passageiros."""
     while True:
-        print('\n=== Gerenciamento de Passageiros ===')
-        print('1 - Cadastrar Passageiro')
-        print('2 - Listar Passageiros')
-        print('3 - Editar Passageiro')
-        print('4 - Remover Passageiro')
-        print('5 - Contar Passageiros por Viagem')
-        print('0 - Voltar')
+        print('\n--- Gerenciamento de Passageiros ---')
+        print('1 - Adicionar Passageiro a uma Viagem')
+        print('2 - Listar Passageiros de uma Viagem')
+        print('3 - Remover Passageiro de uma Viagem')
+        print('0 - Voltar ao Menu Principal')
 
         opcao = input('Escolha uma opção: ')
 
         if opcao == '1':
             cadastrar_passageiro()
         elif opcao == '2':
-            listar_passageiros()
+            listar_passageiros_viagem()
         elif opcao == '3':
-            editar_passageiro()
-        elif opcao == '4':
             remover_passageiro()
-        elif opcao == '5':
-            contar_passageiros()
         elif opcao == '0':
             break
         else:
             print('Opção inválida! Tente novamente.')
 
-# Menu Principal
-def menu():
+# --- MENU PRINCIPAL ---
+
+def menu_principal():
+    """Menu principal que orquestra todo o sistema."""
+    
+    # Carrega os dados salvos assim que o programa inicia
+    carregar_dados()
+
     while True:
-        print('\n==== SISTEMA DE CONTROLE ====\n')
+        print('\n==== SISTEMA DE CONTROLE DE TRANSPORTE ====')
         print('1 - Gerenciamento de Vans')
         print('2 - Gerenciamento de Viagens')
         print('3 - Gerenciamento de Passageiros')
-        print('4 - Salvar Dados')
-        print('5 - Carregar Dados')
-        print('0 - Sair')
+        print('4 - Consultar Detalhes de uma Viagem')
+        print('0 - Salvar e Sair')
 
         opcao = input('Escolha uma opção: ')
 
@@ -96,17 +99,15 @@ def menu():
         elif opcao == '3':
             menu_passageiros()
         elif opcao == '4':
-            salvar_dados()
-            print('Dados salvos com sucesso!')
-        elif opcao == '5': 
-            carregar_dados()
-            print('Dados carregados com sucesso!')
+            consultar_viagem_detalhes()
         elif opcao == '0':
+            # Salva os dados automaticamente antes de encerrar
+            salvar_dados()
             print('Encerrando o sistema...')
             break
         else:
             print('Opção inválida. Tente novamente.')
 
-# Executa o menu se for o arquivo principal
+# --- PONTO DE ENTRADA DO PROGRAMA ---
 if __name__ == "__main__":
-    menu()
+    menu_principal()
