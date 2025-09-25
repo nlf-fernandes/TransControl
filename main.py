@@ -1,4 +1,3 @@
-
 from funcoes.vans import cadastrar_van, listar_vans, atualizar_van, remover_van
 from funcoes.viagens import cadastrar_viagem, listar_viagens
 from funcoes.passageiros import cadastrar_passageiro, listar_passageiros, editar_passageiro, remover_passageiro, contar_passageiros
@@ -111,4 +110,3 @@ def menu():
 # Executa o menu se for o arquivo principal
 if __name__ == "__main__":
     menu()
-
