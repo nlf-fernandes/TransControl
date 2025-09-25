@@ -1,3 +1,5 @@
+# Lista global para integração com utilitarios.py
+lista_viagens = []
 #Abner
 # funcoes/viagens.py
 from .vans import vans  # importa a lista global de vans
