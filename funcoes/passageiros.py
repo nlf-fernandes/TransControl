@@ -1,11 +1,56 @@
+# Lista global para integração com utilitarios.py
+lista_passageiros = []
+# Funções stub para integração com o menu principal
+def cadastrar_passageiro():
+    if not lista_viagens:
+        print("Nenhuma viagem cadastrada. Cadastre uma viagem antes de adicionar passageiros.")
+        return
 
-from funcoes.viagens import viagens
+    print("\n--- Cadastro de Passageiro ---")
+    nome = input("Nome do passageiro: ").strip()
+    try:
+        valor_pago = float(input("Valor pago pelo passageiro: R$ "))
+    except ValueError:
+        print("Valor inválido.")
+        return
+
+    print("Viagens disponíveis:")
+    for v in lista_viagens:
+        print(f"ID: {v['id']} | Destino: {v.get('destino', v.get('origem', ''))}")
+    try:
+        id_viagem = int(input("Digite o ID da viagem para associar o passageiro: "))
+    except ValueError:
+        print("ID inválido.")
+        return
+
+    viagem = next((v for v in lista_viagens if v['id'] == id_viagem), None)
+    if not viagem:
+        print("Viagem não encontrada.")
+        return
+
+    passageiro = {"nome": nome, "valor_pago": valor_pago}
+    viagem["passageiros"].append(passageiro)
+    print(f"Passageiro {nome} cadastrado na viagem {id_viagem} com sucesso!")
+
+def listar_passageiros():
+    print("Função listar_passageiros ainda não implementada.")
+
+def editar_passageiro():
+    print("Função editar_passageiro ainda não implementada.")
+
+def remover_passageiro():
+    print("Função remover_passageiro ainda não implementada.")
+
+def contar_passageiros():
+    print("Função contar_passageiros ainda não implementada.")
+
+from funcoes.viagens import lista_viagens
 
 
 def salvar_dados():
     try:
         with open("dados.txt", "w", encoding="utf-8") as f:
-            for v in viagens:
+            for v in lista_viagens:
                 # salva dados da viagem
                 linha_viagem = f"VIAGEM|{v['id']}|{v['origem']}|{v['destino']}|{v['data']}\n"
                 f.write(linha_viagem)
@@ -23,7 +68,7 @@ def salvar_dados():
 
 def carregar_dados():
     try:
-        viagens.clear()  # limpa lista antes de carregar
+        lista_viagens.clear()  # limpa lista antes de carregar
 
         with open("dados.txt", "r", encoding="utf-8") as f:
             linhas = f.readlines()
@@ -48,7 +93,7 @@ def carregar_dados():
                     passageiro = {"nome": partes[2], "valor_pago": float(partes[3])}
                     viagens_temp[id_viagem]["passageiros"].append(passageiro)
 
-        viagens.extend(viagens_temp.values())
+        lista_viagens.extend(viagens_temp.values())
         print("✅ Dados carregados com sucesso!")
 
     except FileNotFoundError:
